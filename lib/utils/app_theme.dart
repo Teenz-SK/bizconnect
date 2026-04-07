@@ -2,19 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // 🎨 Brand Colors
-  static const Color primaryIndigo = Color(0xFF4F46E5);
-  static const Color secondaryCyan = Color(0xFF06B6D4);
+  // 🌿 B2B Brand Colors
+  static const Color primaryGreen = Color(0xFF0A8F3D);
+  static const Color accentGold = Color(0xFFFFD600);
 
-  static const Color background = Color(0xFFF8FAFC);
+  static const Color softBackground = Color(0xFFF4F7F5);
   static const Color surface = Colors.white;
 
-  static const Color textPrimary = Color(0xFF1E293B);
-  static const Color textSecondary = Color(0xFF64748B);
+  static const Color textDark = Color(0xFF1B2E22);
+  static const Color textSecondary = Color(0xFF5F7A6B);
 
-  // 🌈 Gradient
+  // 🔥 BACKWARD COMPATIBILITY (CONST FIX ✅)
+  static const Color primaryIndigo = primaryGreen;
+  static const Color secondaryCyan = accentGold;
+
+  // 🔥 ALSO ADD THESE (IMPORTANT FOR OLD CODE)
+  static const Color background = softBackground;
+  static const Color textPrimary = textDark;
+
+  // 🌈 Gradient (CONST SAFE)
   static const Gradient primaryGradient = LinearGradient(
-    colors: [primaryIndigo, secondaryCyan],
+    colors: [primaryGreen, Color(0xFF13B85C)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -23,25 +31,30 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: background,
+      scaffoldBackgroundColor: softBackground,
 
-      // ✅ COLOR SYSTEM
+      // 🎨 COLOR SYSTEM
       colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryIndigo,
-        primary: primaryIndigo,
-        secondary: secondaryCyan,
+        seedColor: primaryGreen,
+        primary: primaryGreen,
+        secondary: accentGold,
         surface: surface,
       ),
 
-      // ✅ TYPOGRAPHY (PREMIUM)
+      // 🔤 TYPOGRAPHY
       textTheme: GoogleFonts.plusJakartaSansTextTheme().copyWith(
         displayMedium: GoogleFonts.plusJakartaSans(
-          color: textPrimary,
+          color: textDark,
           fontWeight: FontWeight.bold,
           fontSize: 24,
         ),
+        titleLarge: GoogleFonts.plusJakartaSans(
+          color: textDark,
+          fontWeight: FontWeight.w600,
+          fontSize: 20,
+        ),
         bodyLarge: GoogleFonts.plusJakartaSans(
-          color: textPrimary,
+          color: textDark,
           fontSize: 16,
         ),
         bodyMedium: GoogleFonts.plusJakartaSans(
@@ -50,40 +63,90 @@ class AppTheme {
         ),
       ),
 
-      // ✅ APP BAR
+      // 📱 APP BAR
       appBarTheme: const AppBarTheme(
         backgroundColor: surface,
         elevation: 0,
         centerTitle: false,
-        iconTheme: IconThemeData(color: textPrimary),
+        iconTheme: IconThemeData(color: textDark),
         titleTextStyle: TextStyle(
-          color: textPrimary,
+          color: textDark,
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
       ),
 
-      // ✅ FIXED (Flutter 3.27+)
+      // 🧾 CARD
       cardTheme: const CardThemeData(
         color: surface,
-        elevation: 2,
+        elevation: 3,
         shadowColor: Colors.black12,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
       ),
 
-      // ✅ BUTTON STYLE
+      // ✏️ INPUT FIELD
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          borderSide: BorderSide(color: primaryGreen, width: 2),
+        ),
+
+        errorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          borderSide: BorderSide(color: Colors.red, width: 1),
+        ),
+      ),
+
+      // 🔘 BUTTON
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryIndigo,
+          backgroundColor: primaryGreen,
           foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 52),
+          minimumSize: const Size(double.infinity, 56),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 0,
+          textStyle: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+      ),
+
+      // 🏷️ CHIP
+      chipTheme: ChipThemeData(
+        backgroundColor: primaryGreen.withOpacity(0.1),
+        selectedColor: primaryGreen,
+        labelStyle: const TextStyle(color: textDark),
+        secondaryLabelStyle: const TextStyle(color: Colors.white),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+
+      // ➖ DIVIDER
+      dividerTheme: const DividerThemeData(
+        color: Color(0xFFE2E8F0),
+        thickness: 1,
       ),
     );
   }

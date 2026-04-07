@@ -43,12 +43,16 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
         logoUrl: _nameController.text.isNotEmpty
             ? _nameController.text[0]
             : "B",
-        contact: _contactController.text,
+
+        // ✅ FIXED HERE
+        mobile: _contactController.text,
+
         isVerified: false,
       );
 
       // 🔥 SAVE TO GLOBAL STATE
-      Provider.of<AppState>(context, listen: false).addBusiness(newBiz);
+      Provider.of<AppState>(context, listen: false)
+          .addBusiness(newBiz);
 
       // ✅ FEEDBACK
       ScaffoldMessenger.of(context).showSnackBar(
@@ -79,7 +83,8 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
             children: [
               const Text(
                 "Business Details",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
 
@@ -109,7 +114,7 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
 
               GradientButton(
                 text: "Register Business",
-                onPressed: _handleRegister, // 🔥 CLEAN CALL
+                onPressed: _handleRegister,
               ),
             ],
           ),
@@ -131,7 +136,8 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            style: const TextStyle(
+                fontWeight: FontWeight.w600, fontSize: 14),
           ),
           const SizedBox(height: 8),
           TextFormField(
@@ -153,11 +159,13 @@ class _AddBusinessScreenState extends State<AddBusinessScreen> {
               fillColor: Colors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderSide:
+                    BorderSide(color: Colors.grey.shade300),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderSide:
+                    BorderSide(color: Colors.grey.shade300),
               ),
             ),
           ),

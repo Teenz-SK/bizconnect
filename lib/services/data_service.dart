@@ -1,91 +1,145 @@
+// lib/services/data_service.dart
+
 import '../models/business_model.dart';
 import '../models/post_model.dart';
 
 class DataService {
-  // 🔹 MOCK BUSINESS DATABASE
-  final List<Business> _allBusinesses = [
-    Business(
+  // 🔹 MOCK B2B BUSINESS DATABASE (STRING BASED ✅)
+  final List<B2BBusiness> _b2bBusinesses = [
+    B2BBusiness(
       id: "1",
-      name: "TechNova Solutions",
-      category: "Technology",
-      description: "Custom software and AI integrations.",
-      logoUrl: "TN",
-      contact: "contact@technova.com",
-    ),
-    Business(
-      id: "2",
-      name: "GreenLeaf Organics",
-      category: "Food & Beverage",
-      description: "Farm-to-table organic distribution.",
-      logoUrl: "GL",
-      contact: "hello@greenleaf.com",
-    ),
-    Business(
-      id: "3",
-      name: "Apex Manufacturing",
+      name: "Global Steel Works",
       category: "Manufacturing",
-      description: "Precision tools and industrial parts.",
-      logoUrl: "AM",
-      contact: "ops@apex.com",
+      subcategory: "Industrial Machinery",
+      mobile: "9876543210",
+      email: "info@globalsteel.com",
+      description: "Leading manufacturer of industrial steel components.",
+      address: "Plot 42, Industrial Area, Phase 2",
+      startupYear: "1995",
+      openTime: "09:00 AM",
+      closeTime: "06:00 PM",
+      logoUrl: "GS",
       isVerified: true,
     ),
-    Business(
-      id: "4",
+    B2BBusiness(
+      id: "2",
+      name: "MediTech Pharma",
+      category: "Healthcare",
+      subcategory: "Pharmaceuticals",
+      mobile: "9123456789",
+      email: "sales@meditech.com",
+      description: "Trusted pharmaceutical supplier for hospitals.",
+      address: "Medical Square, City Center",
+      startupYear: "2010",
+      openTime: "08:00 AM",
+      closeTime: "10:00 PM",
+      logoUrl: "MP",
+      isVerified: true,
+    ),
+    B2BBusiness(
+      id: "3",
       name: "CloudScale Systems",
       category: "Technology",
-      description: "Cloud infrastructure and security.",
+      subcategory: "Cloud Infrastructure",
+      mobile: "9988776655",
+      email: "support@cloudscale.com",
+      description: "Enterprise cloud and DevOps solutions.",
+      address: "Tech Park, Tower B",
+      startupYear: "2015",
+      openTime: "10:00 AM",
+      closeTime: "07:00 PM",
       logoUrl: "CS",
-      contact: "support@cloudscale.com",
-      isVerified: true,
     ),
-    Business(
+    B2BBusiness(
+      id: "4",
+      name: "FreshMart Suppliers",
+      category: "Food",
+      subcategory: "Wholesale Supply",
+      mobile: "9871234560",
+      email: "bulk@freshmart.com",
+      description: "Bulk supplier of fresh produce.",
+      address: "Market Yard, Pune",
+      startupYear: "2005",
+      openTime: "06:00 AM",
+      closeTime: "09:00 PM",
+      logoUrl: "FM",
+    ),
+    B2BBusiness(
       id: "5",
-      name: "Urban Estates",
-      category: "Real Estate",
-      description: "Commercial property management.",
-      logoUrl: "UE",
-      contact: "info@urbanestates.com",
+      name: "Apex Manufacturing",
+      category: "Manufacturing",
+      subcategory: "Precision Tools",
+      mobile: "9001122334",
+      email: "ops@apex.com",
+      description: "High precision industrial tools.",
+      address: "MIDC Industrial Zone",
+      startupYear: "2000",
+      openTime: "09:30 AM",
+      closeTime: "06:30 PM",
+      logoUrl: "AM",
+      isVerified: true,
     ),
   ];
 
-  // 🔹 MOCK POSTS DATABASE (NEW)
+  // 🔹 MOCK POSTS DATABASE
   final List<Post> _mockPosts = [
     Post(
       id: "p1",
       businessId: "1",
-      businessName: "TechNova Solutions",
-      category: "Technology",
-      title: "New AI Integration Launch",
+      businessName: "Global Steel Works",
+      category: "Manufacturing",
+      title: "New Machinery Line",
       content:
-          "We just launched our new AI-driven analytics dashboard for small businesses. Check it out!",
+          "We have launched a new automated steel processing unit for bulk orders.",
       timestamp: DateTime.now().subtract(const Duration(hours: 2)),
     ),
     Post(
       id: "p2",
       businessId: "2",
-      businessName: "GreenLeaf Organics",
-      category: "Food & Beverage",
-      title: "Fresh Harvest Alert!",
+      businessName: "MediTech Pharma",
+      category: "Healthcare",
+      title: "Bulk Medicine Supply",
       content:
-          "Our organic avocados are back in stock. B2B bulk orders open now.",
+          "Now accepting large-scale orders for hospitals.",
       timestamp: DateTime.now().subtract(const Duration(hours: 5)),
     ),
   ];
 
-  // 🔹 GET BUSINESSES
-  Future<List<Business>> getBusinesses() async {
-    await Future.delayed(const Duration(milliseconds: 500)); // simulate API
-    return _allBusinesses;
+  // 🔹 GET ALL BUSINESSES
+  Future<List<B2BBusiness>> getBusinesses() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return _b2bBusinesses;
   }
 
-  // 🔹 GET POSTS (NEW)
+  // 🔍 SEARCH + FILTER (STRING BASED ✅)
+  Future<List<B2BBusiness>> searchBusinesses({
+    String query = '',
+    String? category, // ✅ FIXED (String instead of enum)
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    return _b2bBusinesses.where((business) {
+      final matchesQuery =
+          business.name.toLowerCase().contains(query.toLowerCase()) ||
+          business.subcategory.toLowerCase().contains(query.toLowerCase());
+
+      final matchesCategory =
+          category == null ||
+          category == "All" ||
+          business.category.toLowerCase() == category.toLowerCase();
+
+      return matchesQuery && matchesCategory;
+    }).toList();
+  }
+
+  // 🔹 GET POSTS
   Future<List<Post>> getPosts() async {
     await Future.delayed(const Duration(milliseconds: 400));
     return _mockPosts;
   }
 
-  // 🔹 ADD POST (FUTURE READY)
+  // 🔹 ADD POST
   Future<void> addPost(Post post) async {
-    _mockPosts.insert(0, post); // latest on top
+    _mockPosts.insert(0, post);
   }
 }

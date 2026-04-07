@@ -5,112 +5,233 @@ import '../widgets/gradient_button.dart';
 
 class BusinessDetailScreen extends StatelessWidget {
   final Business business;
-  const BusinessDetailScreen({super.key, required this.business});
+
+  const BusinessDetailScreen({
+    super.key,
+    required this.business,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.softBackground,
       body: CustomScrollView(
         slivers: [
-          // Premium Header with Hero Animation
+          // 🔥 PREMIUM HEADER
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 220,
             pinned: true,
+            backgroundColor: AppTheme.primaryGreen,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(gradient: AppTheme.primaryGradient),
-                child: Center(
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      business.logoUrl,
-                      style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryIndigo),
-                    ),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.primaryGreen,
+                      Color(0xFF066129),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 40),
+
+                    CircleAvatar(
+                      radius: 45,
+                      backgroundColor: AppTheme.accentGold,
+                      child: Text(
+                        business.name.isNotEmpty
+                            ? business.name[0]
+                            : "B",
+                        style: const TextStyle(
+                          fontSize: 40,
+                          color: AppTheme.primaryGreen,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Text(
+                      business.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    Text(
+                      business.category,
+                      style: const TextStyle(
+                        color: AppTheme.accentGold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          
+
+          // 🔥 BODY
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(business.name, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryIndigo.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(business.category, style: const TextStyle(color: AppTheme.primaryIndigo, fontWeight: FontWeight.w600)),
-                          ),
-                        ],
+                  // 🔹 BUSINESS PROFILE CARD
+                  _buildDetailCard(
+                    "Business Profile",
+                    [
+                      _buildInfoTile(
+                        Icons.history,
+                        "Established",
+                        business.startupYear,
                       ),
-                      if (business.isVerified)
-                        const Icon(Icons.verified, color: AppTheme.secondaryCyan, size: 32),
+                      _buildInfoTile(
+                        Icons.category_outlined,
+                        "Industry",
+                        business.subcategory,
+                      ),
+                      _buildInfoTile(
+                        Icons.access_time,
+                        "Operating Hours",
+                        "${business.openTime} - ${business.closeTime}",
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  const Text("About Us", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Text(business.description, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 16, height: 1.5)),
-                  const SizedBox(height: 24),
-                  
-                  // Contact Info Section
-                  _buildContactTile(Icons.location_on_outlined, "Location", business.location),
-                  _buildContactTile(Icons.phone_outlined, "Phone", business.contact),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // Primary CTA
+
+                  const SizedBox(height: 16),
+
+                  // 🔹 CONTACT CARD
+                  _buildDetailCard(
+                    "Contact & Location",
+                    [
+                      _buildInfoTile(
+                        Icons.phone_android,
+                        "Mobile",
+                        business.mobile,
+                      ),
+                      _buildInfoTile(
+                        Icons.email_outlined,
+                        "Email",
+                        business.email,
+                      ),
+                      _buildInfoTile(
+                        Icons.location_on_outlined,
+                        "Address",
+                        business.address,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // 🔥 CTA BUTTONS
                   GradientButton(
-                    text: "Connect via WhatsApp", 
-                    onPressed: () {
-                      // Logic for launching URL or WhatsApp
-                    }
-                  ),
-                  const SizedBox(height: 12),
-                  OutlinedButton(
+                    text: "Connect via WhatsApp",
                     onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 52),
-                      side: const BorderSide(color: AppTheme.primaryIndigo),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: const Text("Save to Favorites", style: TextStyle(color: AppTheme.primaryIndigo)),
                   ),
+
+                  const SizedBox(height: 12),
+
+                  ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.call),
+                    label: const Text("INQUIRY NOW"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryGreen,
+                      minimumSize: const Size(double.infinity, 52),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  OutlinedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.directions),
+                    label: const Text("VIEW ON MAP"),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.primaryGreen,
+                      side: const BorderSide(
+                        color: AppTheme.primaryGreen,
+                      ),
+                      minimumSize: const Size(double.infinity, 52),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildContactTile(IconData icon, String label, String value) {
+  // 🔹 CARD
+  Widget _buildDetailCard(String title, List<Widget> children) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppTheme.primaryGreen,
+              fontSize: 16,
+            ),
+          ),
+          const Divider(height: 24),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  // 🔹 INFO TILE
+  Widget _buildInfoTile(
+      IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(icon, color: AppTheme.textSecondary, size: 24),
-          const SizedBox(width: 16),
+          Icon(icon, size: 20, color: Colors.grey),
+          const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
-              Text(value, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+              Text(
+                label,
+                style:
+                    const TextStyle(fontSize: 11, color: Colors.grey),
+              ),
+              Text(
+                value.isEmpty ? "-" : value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           )
         ],
