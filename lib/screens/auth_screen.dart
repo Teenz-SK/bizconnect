@@ -59,13 +59,13 @@ class _B2BAuthScreenState extends State<B2BAuthScreen> {
                     width: 100,
                     height: 100,
                     decoration: const BoxDecoration(
-                      color: AppTheme.accentGold,
+                      color: Color.fromARGB(255, 255, 255, 255),
                       shape: BoxShape.circle,
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(15),
                       child: Image.asset(
-                        'assets/logo.jpeg',
+                        'assets/logo.png',
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -74,7 +74,7 @@ class _B2BAuthScreenState extends State<B2BAuthScreen> {
                   const SizedBox(height: 10),
 
                   const Text(
-                    "BIZCONNECT",
+                    "My Business",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
@@ -91,7 +91,7 @@ class _B2BAuthScreenState extends State<B2BAuthScreen> {
               ),
             ),
 
-            // 🔥 FORM    Hello i'm sanju 
+            // 🔥 FORM    Hello i'm sanju
             Padding(
               padding: const EdgeInsets.all(30.0),
               child: Form(

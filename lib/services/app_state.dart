@@ -3,13 +3,11 @@ import '../models/business_model.dart';
 import 'data_service.dart';
 
 class AppState extends ChangeNotifier {
-  // 🔥 NEW B2B LIST
   List<B2BBusiness> _b2bBusinesses = [];
   bool _isLoading = true;
 
   final DataService _dataService = DataService();
 
-  // 🔹 GETTERS
   List<B2BBusiness> get b2bBusinesses => _b2bBusinesses;
 
   // 🔥 BACKWARD COMPATIBILITY
@@ -17,7 +15,7 @@ class AppState extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
-  // 🔥 INITIALIZE
+  // 🔥 INITIAL LOAD
   Future<void> initialize() async {
     try {
       _isLoading = true;
@@ -32,7 +30,7 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  // 🔹 ADD BUSINESS
+  // 🔥 ADD BUSINESS (FEED AUTO UPDATE)
   void addBusiness(B2BBusiness biz) {
     _b2bBusinesses.insert(0, biz);
     notifyListeners();
@@ -46,12 +44,12 @@ class AppState extends ChangeNotifier {
     }).toList();
   }
 
-  // 🏷️ FILTER BY CATEGORY (FIXED ✅)
+  // 🏷️ FILTER
   List<B2BBusiness> filterByCategory(String category) {
     if (category == "All") return _b2bBusinesses;
 
     return _b2bBusinesses.where((b) {
-      return b.category.toLowerCase() == category.toLowerCase(); // ✅ FIXED
+      return b.category.toLowerCase() == category.toLowerCase();
     }).toList();
   }
 }

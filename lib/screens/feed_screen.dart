@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../models/post_model.dart';
-import '../services/data_service.dart';
+import '../models/business_model.dart';
+import '../services/app_state.dart';
 import '../services/user_service.dart';
 import '../widgets/post_card.dart';
 import '../utils/app_theme.dart';
@@ -13,50 +16,66 @@ class FeedScreen extends StatefulWidget {
 }
 
 class _FeedScreenState extends State<FeedScreen> {
-  final DataService _dataService = DataService();
   String? userCategory;
-  List<Post> allPosts = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadFeed();
+    _loadUserCategory();
   }
 
-  void _loadFeed() async {
+  Future<void> _loadUserCategory() async {
     userCategory = await UserService().getUserCategory();
-    final posts = await _dataService.getPosts();
 
-    if (!mounted) return; // ✅ IMPORTANT FIX
-
-    posts.sort((a, b) {
-      if (a.category == userCategory && b.category != userCategory) return -1;
-      if (a.category != userCategory && b.category == userCategory) return 1;
-      return b.timestamp.compareTo(a.timestamp);
-    });
+    if (!mounted) return;
 
     setState(() {
-      allPosts = posts;
       isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // 🔥 GET LIVE DATA FROM PROVIDER
+    final appState = Provider.of<AppState>(context);
+    final allBusinesses = appState.businesses;
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(title: const Text("Networking Feed"), elevation: 0),
+
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
+          : allBusinesses.isEmpty
+          ? const Center(
+              child: Text(
+                "No businesses yet 🚀\nBe the first to register!",
+                textAlign: TextAlign.center,
+              ),
+            )
           : ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: allPosts.length,
+              itemCount: allBusinesses.length,
               itemBuilder: (context, index) {
-                final post = allPosts[index];
+                final biz = allBusinesses[index];
+
+                // 🔥 CONVERT BUSINESS → POST
+                final post = Post(
+                  id: biz.id,
+                  businessId: biz.id,
+                  businessName: biz.name,
+                  category: biz.category,
+                  title: "New Business Joined! 🎉",
+                  content: biz.about.isNotEmpty
+                      ? biz.about
+                      : "We are now live on My Business!",
+                  timestamp: DateTime.now(),
+                );
+
                 return PostCard(
                   post: post,
-                  isRelevant: post.category == userCategory,
+                  isRelevant: biz.category == userCategory,
                 );
               },
             ),

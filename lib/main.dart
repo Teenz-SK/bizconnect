@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// 🔥 CORE
 import 'services/app_state.dart';
 import 'utils/app_theme.dart';
-
-// 🔥 SCREENS
 import 'screens/splash_screen.dart';
 
 void main() {
@@ -13,7 +10,7 @@ void main() {
 
   runApp(
     ChangeNotifierProvider(
-      create: (context) => AppState()..initialize(), // ✅ IMPORTANT
+      create: (context) => AppState()..initialize(),
       child: const BizConnectApp(),
     ),
   );
@@ -25,13 +22,9 @@ class BizConnectApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BizConnect',
+      title: 'My Business',
       debugShowCheckedModeBanner: false,
-
-      // 🔥 USE B2B THEME
       theme: AppTheme.lightTheme,
-
-      // 🔥 START FROM SPLASH
       home: const SplashScreen(),
     );
   }
