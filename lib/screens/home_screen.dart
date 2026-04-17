@@ -5,7 +5,7 @@ import '../models/business_model.dart';
 import '../services/app_state.dart';
 import '../utils/app_theme.dart';
 import '../utils/categories_data.dart';
-import '../widgets/b2b_card.dart';
+import '../widgets/promotion_card.dart';
 import 'business_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,54 +24,138 @@ class _HomeScreenState extends State<HomeScreen> {
     final appState = Provider.of<AppState>(context);
 
     if (appState.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // 🔍 FILTER LOGIC (FIXED ✅)
-    final List<B2BBusiness> filteredBusinesses =
-        appState.b2bBusinesses.where((business) {
+    final List<B2BBusiness> filteredBusinesses = appState.b2bBusinesses.where((
+      business,
+    ) {
       final matchesSearch =
           business.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              business.subcategory
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase());
+          business.subcategory.toLowerCase().contains(
+            searchQuery.toLowerCase(),
+          );
 
-      final matchesCategory = selectedFilter == "All" ||
-          business.category.toLowerCase() ==
-              selectedFilter.toLowerCase(); // ✅ FIXED
+      final matchesCategory =
+          selectedFilter == "All" ||
+          business.category.toLowerCase() == selectedFilter.toLowerCase();
 
       return matchesSearch && matchesCategory;
     }).toList();
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.softBackground,
+      appBar: AppBar(
+        title: const Text("My Business"),
+        backgroundColor: AppTheme.primaryGreen,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none_rounded),
+            onPressed: () {},
+          ),
+        ],
+      ),
+
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
-          // 🔥 HEADER
-          SliverAppBar(
-            expandedHeight: 140,
-            floating: true,
-            pinned: true,
-            elevation: 0,
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text(
-                "BizConnect B2B",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppTheme.primaryGreen,
-                      Color(0xFF066129),
+          // 🔥 PREMIUM HERO (NO YELLOW BLOCK)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: TweenAnimationBuilder(
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeOutCubic,
+                tween: Tween<double>(begin: 0, end: 1),
+                builder: (context, double value, child) {
+                  return Opacity(
+                    opacity: value,
+                    child: Transform.translate(
+                      offset: Offset(0, 30 * (1 - value)),
+                      child: child,
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white, // ✅ CLEAN SURFACE
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: AppTheme.cardShadow,
+                  ),
+                  child: Row(
+                    children: [
+                      // 🟡 SUBTLE ACCENT ICON BOX
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: AppTheme.accentYellow.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.trending_up_rounded,
+                          color: AppTheme.primaryGreen,
+                          size: 28,
+                        ),
+                      ),
+
+                      const SizedBox(width: 14),
+
+                      // TEXT + CTA
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Grow Faster 🚀",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+
+                            const SizedBox(height: 6),
+
+                            const Text(
+                              "Promote your business and reach more customers.",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            Row(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppTheme.primaryGreen,
+                                    minimumSize: const Size(110, 36),
+                                  ),
+                                  child: const Text(
+                                    "Get Featured",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 10),
+
+                                const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 14,
+                                  color: AppTheme.primaryGreen,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
                   ),
                 ),
               ),
@@ -81,23 +165,16 @@ class _HomeScreenState extends State<HomeScreen> {
           // 🔍 SEARCH + FILTER
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 children: [
                   TextField(
-                    onChanged: (val) =>
-                        setState(() => searchQuery = val),
+                    onChanged: (val) => setState(() => searchQuery = val),
                     decoration: InputDecoration(
-                      hintText: "Search suppliers, manufacturers...",
+                      hintText: "Search businesses...",
                       prefixIcon: const Icon(
                         Icons.search,
                         color: AppTheme.primaryGreen,
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
@@ -108,49 +185,57 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // 📊 RESULT COUNT
+          // COUNT
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "${filteredBusinesses.length} Businesses Found",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(color: Colors.grey),
               ),
             ),
           ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 10)),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-          // 📋 LIST
+          // 🔥 BUSINESS LIST
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final business = filteredBusinesses[index];
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final business = filteredBusinesses[index];
 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: B2BCard(
-                      business: business,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => BusinessDetailScreen(
-                              business: business,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-                childCount: filteredBusinesses.length,
-              ),
+                return TweenAnimationBuilder(
+                  duration: Duration(milliseconds: 400 + (index * 120)),
+                  curve: Curves.easeOutCubic,
+                  tween: Tween<double>(begin: 0, end: 1),
+                  builder: (context, double value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.translate(
+                        offset: Offset(0, 30 * (1 - value)),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: PromotionCard(
+                    title: business.name,
+                    desc: business.about.isNotEmpty
+                        ? business.about
+                        : "Leading provider in ${business.category}.",
+                    isFeatured: index % 3 == 0,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              BusinessDetailScreen(business: business),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }, childCount: filteredBusinesses.length),
             ),
           ),
 
@@ -160,7 +245,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 🏷️ CATEGORY CHIPS
   Widget _buildCategoryChips() {
     final categories = ["All", ...CategoriesData.b2bCategories.keys];
 
@@ -181,23 +265,14 @@ class _HomeScreenState extends State<HomeScreen> {
               onSelected: (_) {
                 setState(() => selectedFilter = category);
               },
-              selectedColor: AppTheme.accentGold,
-              checkmarkColor: AppTheme.primaryGreen,
+              selectedColor: AppTheme.accentYellow.withValues(alpha: 0.2),
               labelStyle: TextStyle(
                 color: isSelected
                     ? AppTheme.primaryGreen
-                    : Colors.grey,
-                fontWeight:
-                    isSelected ? FontWeight.bold : FontWeight.normal,
+                    : AppTheme.textSecondary,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
               backgroundColor: Colors.white,
-              shape: StadiumBorder(
-                side: BorderSide(
-                  color: isSelected
-                      ? AppTheme.accentGold
-                      : Colors.grey.shade300,
-                ),
-              ),
             ),
           );
         },

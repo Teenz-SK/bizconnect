@@ -10,21 +10,24 @@ void main() {
 
   runApp(
     ChangeNotifierProvider(
-      create: (context) => AppState()..initialize(),
-      child: const BizConnectApp(),
+      create: (_) => AppState()..initialize(), // ✅ KEEP THIS
+      child: const MyBusinessApp(),
     ),
   );
 }
 
-class BizConnectApp extends StatelessWidget {
-  const BizConnectApp({super.key});
+class MyBusinessApp extends StatelessWidget {
+  const MyBusinessApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My Business',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
+      title: 'My Business',
+
+      // 🔥 USE UPDATED THEME
+      theme: AppTheme.lightTheme, // ✅ correct
+
       home: const SplashScreen(),
     );
   }

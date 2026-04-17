@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // ✅ FIX
 import '../utils/app_theme.dart';
 import '../utils/categories_data.dart';
-import 'package:intl/intl.dart';
+
 import 'map_picker_screen.dart';
 
 // ✅ ADD THESE IMPORTS (VERY IMPORTANT)

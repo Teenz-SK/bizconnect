@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/post_model.dart';
-import '../models/business_model.dart';
+
 import '../services/app_state.dart';
 import '../services/user_service.dart';
 import '../widgets/post_card.dart';

@@ -4,20 +4,16 @@ import '../utils/app_theme.dart';
 
 class BusinessCard extends StatelessWidget {
   final Business business;
-  final VoidCallback? onTap; // 🔥 ADD THIS
+  final VoidCallback? onTap;
 
-  const BusinessCard({
-    super.key,
-    required this.business,
-    this.onTap,
-  });
+  const BusinessCard({super.key, required this.business, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap, // 🔥 HANDLE CLICK
+        onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
           margin: const EdgeInsets.only(bottom: 16),
@@ -35,7 +31,7 @@ class BusinessCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // 🔹 LOGO
+              // 🔹 LOGO WITH NEW GRADIENT
               Container(
                 width: 60,
                 height: 60,
@@ -52,9 +48,7 @@ class BusinessCard extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(width: 16),
-
               // 🔹 INFO
               Expanded(
                 child: Column(
@@ -82,9 +76,7 @@ class BusinessCard extends StatelessWidget {
                           ),
                       ],
                     ),
-
                     const SizedBox(height: 4),
-
                     Text(
                       business.category,
                       style: const TextStyle(
@@ -93,9 +85,7 @@ class BusinessCard extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-
                     const SizedBox(height: 4),
-
                     Text(
                       business.description,
                       maxLines: 1,
@@ -108,9 +98,7 @@ class BusinessCard extends StatelessWidget {
                   ],
                 ),
               ),
-
               const SizedBox(width: 8),
-
               const Icon(
                 Icons.arrow_forward_ios,
                 size: 14,
