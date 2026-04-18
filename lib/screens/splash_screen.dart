@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/app_theme.dart';
-import 'login_screen.dart';
+import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,69 +11,50 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  late AnimationController _logoController;
-  late Animation<double> _logoFade;
-  late Animation<double> _logoScale;
-
-  int _dialogueIndex = 0;
-  final List<String> _dialogues = [
-    "Connect your business with customers instantly",
-    "Grow faster with smart business networking",
-    "Promote your business and reach more people",
-  ];
+  late AnimationController _controller;
+  late Animation<double> _fade;
+  late Animation<double> _scale;
 
   @override
   void initState() {
     super.initState();
 
-    _logoController = AnimationController(
+    _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1800),
     );
 
-    _logoFade = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _logoController,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
-      ),
-    );
+    _fade = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
-    _logoScale = Tween(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
-    );
+    _scale = Tween(
+      begin: 0.85,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
-    _logoController.forward();
-    _playDialogueSequence();
-  }
+    _controller.forward();
 
-  void _playDialogueSequence() async {
-    for (int i = 0; i < _dialogues.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 2800));
+    // 🔥 AUTO NAVIGATE (NO DIALOGUES)
+    Future.delayed(const Duration(milliseconds: 2200), () {
       if (!mounted) return;
-      if (i == _dialogues.length - 1) {
-        _navigateToLogin();
-      } else {
-        setState(() => _dialogueIndex++);
-      }
-    }
-  }
 
-  void _navigateToLogin() {
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 1000),
-        pageBuilder: (context, anim, secondaryAnim) =>
-            const LoginScreen(), // ✅ FIXED CLASS NAME
-        transitionsBuilder: (context, anim, secondaryAnim, child) =>
-            FadeTransition(opacity: anim, child: child),
-      ),
-    );
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 800),
+          pageBuilder: (_, __, ___) => const OnboardingScreen(),
+          transitionsBuilder: (_, anim, __, child) =>
+              FadeTransition(opacity: anim, child: child),
+        ),
+      );
+    });
   }
 
   @override
   void dispose() {
-    _logoController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -89,85 +70,25 @@ class _SplashScreenState extends State<SplashScreen>
             center: Alignment.center,
             radius: 1.2,
             colors: [
-              AppTheme.accentYellow.withOpacity(0.15),
+              AppTheme.accentYellow.withValues(alpha: 0.12),
               AppTheme.softBackground,
             ],
           ),
         ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FadeTransition(
-                  opacity: _logoFade,
-                  child: ScaleTransition(
-                    scale: _logoScale,
-                    child: Image.asset(
-                      'assets/logo.png',
-                      width: 240,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 60),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 800),
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position:
-                              Tween<Offset>(
-                                begin: const Offset(0, 0.5),
-                                end: Offset.zero,
-                              ).animate(
-                                CurvedAnimation(
-                                  parent: animation,
-                                  curve: Curves.easeOutCubic,
-                                ),
-                              ),
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: Text(
-                      _dialogues[_dialogueIndex],
-                      key: ValueKey(_dialogueIndex),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppTheme.primaryGreen,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              bottom: 80,
-              child: Row(
-                children: List.generate(_dialogues.length, (index) {
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 400),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: _dialogueIndex == index ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: _dialogueIndex == index
-                          ? AppTheme.primaryGreen
-                          : AppTheme.primaryGreen.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  );
-                }),
+
+        // 🔥 CENTER LOGO (PREMIUM)
+        child: Center(
+          child: FadeTransition(
+            opacity: _fade,
+            child: ScaleTransition(
+              scale: _scale,
+              child: Image.asset(
+                'assets/logo.png',
+                width: 260, // 🔥 increase logo size here
+                fit: BoxFit.contain,
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -218,22 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   },
-                  child: PromotionCard(
-                    title: business.name,
-                    desc: business.about.isNotEmpty
-                        ? business.about
-                        : "Leading provider in ${business.category}.",
-                    isFeatured: index % 3 == 0,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              BusinessDetailScreen(business: business),
-                        ),
-                      );
-                    },
-                  ),
+                  child: PromotionCard(business: business, index: index),
                 );
               }, childCount: filteredBusinesses.length),
             ),
