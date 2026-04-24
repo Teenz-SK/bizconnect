@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import '../utils/app_theme.dart';
+import '../widgets/floating_blob.dart';
 import 'login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -11,25 +13,37 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
+  double pageOffset = 0;
   int currentIndex = 0;
 
   final List<Map<String, dynamic>> slides = [
     {
       "title": "Connect Businesses",
       "desc": "Connect your business with customers instantly",
-      "icon": Icons.hub_rounded,
+      "lottie": "assets/lottie/connect.json",
     },
     {
       "title": "Grow Faster",
       "desc": "Promote and expand your business with smart networking",
-      "icon": Icons.trending_up_rounded,
+      "lottie": "assets/lottie/growth.json",
     },
     {
       "title": "Smart Insights",
       "desc": "Track growth and reach the right audience effectively",
-      "icon": Icons.insights_rounded,
+      "lottie": "assets/lottie/insights.json",
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller.addListener(() {
+      setState(() {
+        pageOffset = _controller.page ?? 0;
+      });
+    });
+  }
 
   void _next() {
     if (currentIndex == slides.length - 1) {
@@ -39,8 +53,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       );
     } else {
       _controller.nextPage(
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOutCubic,
+        duration: const Duration(milliseconds: 700),
+        curve: Curves.easeOutCubic,
       );
     }
   }
@@ -51,30 +65,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: AppTheme.softBackground,
       body: Stack(
         children: [
-          // 🔥 BACKGROUND GLOW (LAYERED)
+          // 🔥 PARALLAX FLOATING BLOBS
           Positioned(
-            top: -120,
-            right: -80,
-            child: Container(
-              height: 260,
-              width: 260,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.accentYellow.withValues(alpha: 0.08),
-              ),
+            top: -120 + (pageOffset * -20),
+            right: -100 + (pageOffset * 10),
+            child: const FloatingBlob(
+              size: 400,
+              color: AppTheme.primaryGreen,
+              duration: Duration(seconds: 6),
+              parallaxFactor: 1.2,
             ),
           ),
 
           Positioned(
-            bottom: -100,
-            left: -60,
-            child: Container(
-              height: 220,
-              width: 220,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.primaryGreen.withValues(alpha: 0.05),
-              ),
+            bottom: -140 + (pageOffset * 30),
+            left: -100 + (pageOffset * -10),
+            child: const FloatingBlob(
+              size: 400,
+              color: AppTheme.accentYellow,
+              duration: Duration(seconds: 8),
+              parallaxFactor: 1.5,
+            ),
+          ),
+
+          Positioned(
+            top: 200 + (pageOffset * 40),
+            left: -80,
+            child: const FloatingBlob(
+              size: 260,
+              color: AppTheme.primaryGreen,
+              duration: Duration(seconds: 10),
+              parallaxFactor: 2,
             ),
           ),
 
@@ -101,39 +122,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: PageView.builder(
                     controller: _controller,
                     itemCount: slides.length,
-                    onPageChanged: (i) => setState(() => currentIndex = i),
+                    onPageChanged: (i) => currentIndex = i,
                     itemBuilder: (context, index) {
                       final slide = slides[index];
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // 🔥 PREMIUM HERO CARD (GLASS STYLE)
-                            TweenAnimationBuilder(
-                              duration: const Duration(milliseconds: 700),
-                              tween: Tween(begin: 0.9, end: 1.0),
-                              curve: Curves.easeOutBack,
-                              builder: (context, double scale, child) {
-                                return Transform.scale(
-                                  scale: scale,
-                                  child: child,
-                                );
-                              },
-                              child: Container(
-                                height: 260,
+                      final scale = (1 - (pageOffset - index).abs()).clamp(
+                        0.85,
+                        1.0,
+                      );
+
+                      return Transform.scale(
+                        scale: scale,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // 🔥 GLASS HERO CARD
+                              Container(
+                                height: 280,
                                 width: double.infinity,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.white,
-                                      AppTheme.accentYellow.withValues(
-                                        alpha: 0.08,
-                                      ),
-                                    ],
-                                  ),
+                                  borderRadius: BorderRadius.circular(32),
+                                  color: Colors.white.withValues(alpha: 0.8),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withValues(
@@ -145,41 +156,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   ],
                                 ),
                                 child: Center(
-                                  child: Icon(
-                                    slide["icon"],
-                                    size: 90,
-                                    color: AppTheme.primaryGreen,
+                                  child: Lottie.asset(
+                                    slide["lottie"],
+                                    height: 180,
                                   ),
                                 ),
                               ),
-                            ),
 
-                            const SizedBox(height: 50),
+                              const SizedBox(height: 50),
 
-                            // 🔥 TITLE
-                            Text(
-                              slide["title"],
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w900,
-                                color: AppTheme.textPrimary,
+                              Text(
+                                slide["title"],
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppTheme.textPrimary,
+                                ),
                               ),
-                            ),
 
-                            const SizedBox(height: 12),
+                              const SizedBox(height: 12),
 
-                            // 🔥 DESCRIPTION
-                            Text(
-                              slide["desc"],
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                color: AppTheme.textSecondary,
-                                height: 1.5,
+                              Text(
+                                slide["desc"],
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: AppTheme.textSecondary,
+                                  height: 1.5,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -194,7 +202,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   child: Column(
                     children: [
-                      // DOTS
+                      // 🔥 DOTS
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
@@ -203,7 +211,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             duration: const Duration(milliseconds: 300),
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             height: 8,
-                            width: currentIndex == index ? 24 : 8,
+                            width: currentIndex == index ? 26 : 8,
                             decoration: BoxDecoration(
                               color: currentIndex == index
                                   ? AppTheme.primaryGreen
@@ -216,11 +224,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                       const SizedBox(height: 30),
 
-                      // 🔥 PREMIUM BUTTON
+                      // 🔥 BUTTON
                       GestureDetector(
                         onTap: _next,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
+                        child: Container(
                           height: 56,
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -230,30 +237,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 AppTheme.primaryGreen.withValues(alpha: 0.85),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
                                 color: AppTheme.primaryGreen.withValues(
                                   alpha: 0.3,
                                 ),
-                                blurRadius: 18,
+                                blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
                             ],
                           ),
                           child: Center(
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 300),
-                              child: Text(
-                                currentIndex == slides.length - 1
-                                    ? "Get Started"
-                                    : "Next",
-                                key: ValueKey(currentIndex),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            child: Text(
+                              currentIndex == slides.length - 1
+                                  ? "Get Started"
+                                  : "Next",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
