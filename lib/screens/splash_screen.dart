@@ -1,5 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../utils/app_theme.dart';
+import '../widgets/floating_blob.dart';
 import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -14,6 +16,7 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fade;
   late Animation<double> _scale;
+  late AnimationController _pulse;
 
   @override
   void initState() {
@@ -34,9 +37,14 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+
     _controller.forward();
 
-    // 🔥 AUTO NAVIGATE (NO DIALOGUES)
+    /// 🔥 NAVIGATION (UNCHANGED)
     Future.delayed(const Duration(milliseconds: 2200), () {
       if (!mounted) return;
 
@@ -55,6 +63,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void dispose() {
     _controller.dispose();
+    _pulse.dispose();
     super.dispose();
   }
 
@@ -62,34 +71,108 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.softBackground,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.center,
-            radius: 1.2,
-            colors: [
-              AppTheme.accentYellow.withValues(alpha: 0.12),
-              AppTheme.softBackground,
-            ],
+      body: Stack(
+        children: [
+          /// 🔥 BACKGROUND BLUR LAYER
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              child: Container(color: Colors.white.withValues(alpha: 0.05)),
+            ),
           ),
-        ),
 
-        // 🔥 CENTER LOGO (PREMIUM)
-        child: Center(
-          child: FadeTransition(
-            opacity: _fade,
-            child: ScaleTransition(
-              scale: _scale,
-              child: Image.asset(
-                'assets/logo.png',
-                width: 260, // 🔥 increase logo size here
-                fit: BoxFit.contain,
+          /// 🔥 HEARTBEAT + FLOATING BLOBS
+          AnimatedBuilder(
+            animation: _pulse,
+            builder: (context, child) {
+              double scale = 1 + (_pulse.value * 0.08);
+
+              return Stack(
+                children: [
+                  Positioned(
+                    top: -140,
+                    right: -120,
+                    child: Transform.scale(
+                      scale: scale,
+                      child: const FloatingBlob(
+                        size: 420,
+                        color: AppTheme.primaryGreen,
+                        duration: Duration(seconds: 6),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: -160,
+                    left: -120,
+                    child: Transform.scale(
+                      scale: scale,
+                      child: const FloatingBlob(
+                        size: 400,
+                        color: AppTheme.accentBrown,
+                        duration: Duration(seconds: 8),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+
+          /// 🔥 CENTER CONTENT
+          Center(
+            child: FadeTransition(
+              opacity: _fade,
+              child: ScaleTransition(
+                scale: _scale,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    /// 💎 LOGO (ENHANCED DEPTH)
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.9),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primaryGreen.withValues(
+                              alpha: 0.15,
+                            ),
+                            blurRadius: 40,
+                            offset: const Offset(0, 20),
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/logo1.png',
+                        width: 160,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    /// 🔥 BRAND TEXT (GRADIENT)
+                    // ShaderMask(
+                    //   shaderCallback: (bounds) => const LinearGradient(
+                    //     colors: [AppTheme.primaryEmerald, AppTheme.emeraldDark],
+                    //   ).createShader(bounds),
+                    //   child: const Text(
+                    //     "My Business",
+                    //     style: TextStyle(
+                    //       fontSize: 22,
+                    //       fontWeight: FontWeight.w800,
+                    //       color: Colors.white,
+                    //       letterSpacing: 0.5,
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

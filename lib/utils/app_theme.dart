@@ -2,30 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // 🎯 BRAND COLORS
-  static const Color accentYellow = Color(0xFFFFD600); // 🟡 70%
-  static const Color primaryGreen = Color(0xFF0A8F3D); // 🟢 30%
+  // 🎯 BRAND COLORS (EMERALD + GREY + BROWN BALANCED)
+  static const Color primaryEmerald = Color(0xFF10B981);
+  static const Color emeraldDark = Color(0xFF047857);
 
-  static const Color softBackground = Color(0xFFF9F9F9);
+  static const Color accentBrown = Color(0xFF8B5E3C);
+  static const Color lightBrown = Color(0xFFD6C2A8);
+
+  // 🔥 GREY SYSTEM (LAYERED DEPTH)
+  static const Color greyBackground = Color(0xFFF5F7F6);
+  static const Color greyLight = Color(0xFFF9FAFB);
+  static const Color greyMedium = Color(0xFFE5E7EB);
+
   static const Color surface = Colors.white;
 
-  static const Color textPrimary = Color(0xFF1B2E22);
-  static const Color textSecondary = Color(0xFF64748B);
+  static const Color textPrimary = Color(0xFF1F2937);
+  static const Color textSecondary = Color(0xFF6B7280);
 
-  // 🔥 LEGACY SUPPORT (NO ERRORS)
-  static const Color primaryIndigo = primaryGreen;
-  static const Color secondaryCyan = accentYellow;
-  static const Color accentGold = accentYellow;
-  static const Color background = softBackground;
+  // 🔥 LEGACY SUPPORT (NO BREAK)
+  static const Color primaryGreen = primaryEmerald;
+  static const Color accentYellow = accentBrown;
+  static const Color primaryIndigo = primaryEmerald;
+  static const Color secondaryCyan = accentBrown;
+  static const Color accentGold = accentBrown;
+  static const Color background = greyBackground;
+  static const Color softBackground = greyBackground;
 
-  // 🌈 GRADIENT
+  // 🌈 PREMIUM GRADIENT (WITH BROWN DEPTH)
   static const Gradient primaryGradient = LinearGradient(
-    colors: [primaryGreen, Color(0xFF086B2E)],
+    colors: [
+      primaryEmerald,
+      accentBrown, // 👈 ADDED FOR DEPTH
+      emeraldDark,
+    ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // 💎 PREMIUM SHADOW SYSTEM
+  // 💎 SHADOW SYSTEM
   static List<BoxShadow> softShadow = [
     BoxShadow(
       color: Colors.black.withValues(alpha: 0.04),
@@ -46,12 +60,12 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: softBackground,
+      scaffoldBackgroundColor: greyBackground,
 
       colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryGreen,
-        primary: primaryGreen,
-        secondary: accentYellow,
+        seedColor: primaryEmerald,
+        primary: primaryEmerald,
+        secondary: accentBrown,
         surface: surface,
       ),
 
@@ -69,7 +83,7 @@ class AppTheme {
         bodyMedium: const TextStyle(color: textSecondary),
       ),
 
-      // 📱 APPBAR (GLASS STYLE)
+      // 📱 APPBAR (GLASS READY)
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -81,10 +95,10 @@ class AppTheme {
         ),
       ),
 
-      // 🔘 BUTTON
+      // 🔘 PRIMARY BUTTON (EMERALD)
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryGreen,
+          backgroundColor: primaryEmerald,
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 54),
           shape: RoundedRectangleBorder(
@@ -94,10 +108,10 @@ class AppTheme {
         ),
       ),
 
-      // ✏️ INPUT (SOFT UI)
+      // ✏️ INPUT (LAYERED GREY SYSTEM)
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surface,
+        fillColor: greyLight, // 👈 better than plain white
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 16,
@@ -108,23 +122,27 @@ class AppTheme {
         ),
       ),
 
-      // 🏷️ CHIP
+      // 🏷️ CHIP (STRONGER BROWN)
       chipTheme: ChipThemeData(
-        backgroundColor: accentYellow.withValues(alpha: 0.2),
-        selectedColor: accentYellow,
+        backgroundColor: lightBrown.withValues(alpha: 0.25),
+        selectedColor: accentBrown.withValues(alpha: 0.35),
         labelStyle: const TextStyle(color: textPrimary),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
 
-      // 🧾 CARD (SOFT FLOATING)
-      cardTheme: const CardThemeData(
+      // 🧾 CARD (LAYERED SURFACE)
+      cardTheme: CardThemeData(
         color: surface,
         elevation: 0,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(24)),
         ),
+        shadowColor: Colors.black.withValues(alpha: 0.05),
       ),
+
+      // 🔥 DIVIDER (FOR SECTION SEPARATION)
+      dividerTheme: const DividerThemeData(color: greyMedium, thickness: 1),
     );
   }
 }

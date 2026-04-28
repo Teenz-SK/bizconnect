@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,7 +15,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
   bool isOtpStage = false;
@@ -28,14 +29,21 @@ class _LoginScreenState extends State<LoginScreen>
   final _otpController = TextEditingController();
 
   late AnimationController _shakeController;
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
+
     _shakeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
   }
 
   void _shake() {
@@ -72,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void dispose() {
     _shakeController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -79,9 +88,23 @@ class _LoginScreenState extends State<LoginScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.softBackground,
+
+      /// 🧊 GLASS APPBAR
+      appBar: AppBar(
+        title: const Text(""),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(color: Colors.white.withValues(alpha: 0.5)),
+          ),
+        ),
+      ),
+
       body: Stack(
         children: [
-          /// 🔥 PREMIUM BACKGROUND (LAYERED GRADIENT)
+          /// 🌈 LAYERED BACKGROUND
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -96,35 +119,49 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
 
-          /// 🌫 BIG GLOW BLOBS (MORE RADIUS + PULSE FEEL)
-          const Positioned(
-            top: -140,
-            right: -120,
-            child: FloatingBlob(
-              size: 420, // 🔥 bigger
-              color: AppTheme.primaryGreen,
-              duration: Duration(seconds: 6),
-            ),
-          ),
-          const Positioned(
-            bottom: -140,
-            left: -120,
-            child: FloatingBlob(
-              size: 380, // 🔥 bigger
-              color: AppTheme.accentYellow,
-              duration: Duration(seconds: 8),
-            ),
+          /// 🔥 FLOATING + PULSE BLOBS
+          AnimatedBuilder(
+            animation: _pulseController,
+            builder: (context, child) {
+              double scale = 1 + (_pulseController.value * 0.08);
+
+              return Stack(
+                children: [
+                  Positioned(
+                    top: -150,
+                    right: -120,
+                    child: Transform.scale(
+                      scale: scale,
+                      child: const FloatingBlob(
+                        size: 450,
+                        color: AppTheme.primaryGreen,
+                        duration: Duration(seconds: 6),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: -160,
+                    left: -120,
+                    child: Transform.scale(
+                      scale: scale,
+                      child: const FloatingBlob(
+                        size: 420,
+                        color: AppTheme.accentYellow,
+                        duration: Duration(seconds: 8),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
 
           SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 30),
-
-                _buildHeader(),
-
                 const SizedBox(height: 20),
-
+                _buildHeader(),
+                const SizedBox(height: 20),
                 Expanded(child: Center(child: _buildCard())),
               ],
             ),
@@ -139,15 +176,16 @@ class _LoginScreenState extends State<LoginScreen>
     return Column(
       children: [
         Container(
-          width: 100,
-          height: 100,
-          decoration: const BoxDecoration(
+          width: 110,
+          height: 110,
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white,
+            boxShadow: AppTheme.cardShadow,
           ),
           child: Padding(
             padding: const EdgeInsets.all(14),
-            child: Image.asset("assets/logo.png"),
+            child: Image.asset("assets/logo1.png"),
           ),
         ),
         const SizedBox(height: 12),
@@ -175,104 +213,194 @@ class _LoginScreenState extends State<LoginScreen>
 
         return Transform.translate(offset: Offset(offset, 0), child: child);
       },
-      child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.92),
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 40,
-              offset: const Offset(0, 25),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: AppTheme.cardShadow,
             ),
-          ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildToggle(),
+                const SizedBox(height: 20),
+                Form(
+                  key: _formKey,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 400),
+                    child: isOtpStage ? _otpUI() : _formUI(),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildToggle(),
-            const SizedBox(height: 20),
-            Form(
-              key: _formKey,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: isOtpStage ? _otpUI() : _formUI(),
+      ),
+    );
+  }
+
+  /// 🔥 INPUT WITH FOCUS EFFECT
+  Widget _input(
+    String hint,
+    IconData icon,
+    TextEditingController controller, {
+    bool isNumber = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Focus(
+        child: Builder(
+          builder: (context) {
+            final isFocused = Focus.of(context).hasFocus;
+
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              decoration: BoxDecoration(
+                boxShadow: isFocused
+                    ? [
+                        BoxShadow(
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.2),
+                          blurRadius: 20,
+                        ),
+                      ]
+                    : [],
               ),
-            ),
-          ],
+              child: TextFormField(
+                controller: controller,
+                keyboardType: isNumber
+                    ? TextInputType.phone
+                    : TextInputType.text,
+                validator: (val) =>
+                    val == null || val.isEmpty ? "Required" : null,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    icon,
+                    color: isFocused
+                        ? AppTheme.primaryGreen
+                        : AppTheme.textSecondary,
+                  ),
+                  hintText: hint,
+                  filled: true,
+                  fillColor: AppTheme.greyLight,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  /// 🔥 TOGGLE (UPGRADED DEPTH + GRADIENT)
-  Widget _buildToggle() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.accentYellow.withValues(alpha: 0.15),
-            AppTheme.accentYellow.withValues(alpha: 0.05),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(children: [_tab("Login", true), _tab("Register", false)]),
-    );
-  }
+  /// 🔥 BUTTON
+  Widget _button({required String text, required VoidCallback onTap}) {
+    return TweenAnimationBuilder(
+      duration: const Duration(milliseconds: 150),
+      tween: Tween<double>(begin: 1, end: isLoading ? 0.96 : 1),
+      builder: (context, double scale, child) {
+        return Transform.scale(
+          scale: scale,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: isLoading ? null : onTap,
+              borderRadius: BorderRadius.circular(18),
+              splashColor: Colors.white.withValues(alpha: 0.2),
+              highlightColor: Colors.transparent,
+              child: Ink(
+                height: 54,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF10B981), // emerald
+                      Color(0xFF059669), // deeper emerald
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
 
-  Widget _tab(String title, bool isLogin) {
-    final selected = isLoginMode == isLogin;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            isLoginMode = isLogin;
-            isOtpStage = false;
-          });
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            gradient: selected
-                ? const LinearGradient(
-                    colors: [Colors.white, Color(0xFFF8F8F8)],
-                  )
-                : null,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: selected
-                ? [
+                  /// 💎 SHADOW (DEPTH)
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                      blurRadius: 22,
+                      offset: const Offset(0, 12),
                     ),
-                  ]
-                : [],
-          ),
-          child: Center(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: selected
-                    ? AppTheme.primaryGreen
-                    : AppTheme.textSecondary,
+                  ],
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    /// ✨ TOP LIGHT (GLASS EFFECT)
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: 22,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withValues(alpha: 0.25),
+                              Colors.transparent,
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// 🔘 CONTENT
+                    isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.lock_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                text,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  /// 🔥 FORM
+  /// 🔹 FORM
   Widget _formUI() {
     return Column(
       key: const ValueKey("form"),
@@ -292,7 +420,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  /// 🔥 OTP
+  /// 🔹 OTP
   Widget _otpUI() {
     return Column(
       key: const ValueKey("otp"),
@@ -312,63 +440,65 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  /// 🔥 INPUT
-  Widget _input(
-    String hint,
-    IconData icon,
-    TextEditingController controller, {
-    bool isNumber = false,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: isNumber ? TextInputType.phone : TextInputType.text,
-        validator: (val) => val == null || val.isEmpty ? "Required" : null,
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: AppTheme.primaryGreen),
-          hintText: hint,
-          filled: true,
-          fillColor: Colors.grey.shade50,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
-    );
+  /// 🔥 TOGGLE (unchanged logic, enhanced UI)
+  Widget _buildToggle() {
+    return Row(children: [_tab("Login", true), _tab("Register", false)]);
   }
 
-  /// 🔥 BUTTON
-  Widget _button({required String text, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 52,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppTheme.primaryGreen, Color(0xFF3AA35C)],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primaryGreen.withValues(alpha: 0.25),
-              blurRadius: 18,
-              offset: const Offset(0, 10),
+  Widget _tab(String title, bool isLogin) {
+    final selected = isLoginMode == isLogin;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            isLoginMode = isLogin;
+            isOtpStage = false;
+          });
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+
+            // 💎 LIGHT PREMIUM STYLE (not heavy)
+            gradient: selected
+                ? LinearGradient(
+                    colors: [
+                      AppTheme.primaryEmerald.withValues(alpha: 0.15),
+                      AppTheme.lightBrown.withValues(alpha: 0.12),
+                    ],
+                  )
+                : null,
+
+            // 🔥 SUBTLE BORDER (important)
+            border: Border.all(
+              color: selected
+                  ? AppTheme.primaryEmerald.withValues(alpha: 0.4)
+                  : Colors.transparent,
             ),
-          ],
-        ),
-        child: isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+          ),
+
+          child: Center(
+            child: AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+
+                // 🎯 TEXT COLOR SYSTEM
+                color: selected
+                    ? AppTheme.primaryEmerald
+                    : AppTheme.textSecondary,
               ),
+              child: Text(title),
+            ),
+          ),
+        ),
       ),
     );
   }
